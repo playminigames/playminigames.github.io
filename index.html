@@ -1,47 +1,3 @@
-// Function to handle opening a game
-function launchGame(gameId) {
-    const modal = document.getElementById('gameModal');
-    const container = document.getElementById('gameCanvasContainer');
-    
-    // Show the modal overlay
-    modal.style.display = "flex";
-    
-    // Check if the clicked game is Neon Merge
-    if (gameId === 'space-invaders') {
-        // We will treat space-invaders as our Neon Merge ID
-        container.innerHTML = `
-            <iframe 
-                id="gameFrame"
-                srcdoc='${getNeonMergeSource()}' 
-                style="width: 100%; height: 600px; border: none; border-radius: 8px;"
-                allow="autoplay">
-            </iframe>`;
-    } else {
-        // Fallback placeholders for other grid slots
-        container.innerHTML = `<h3>[${gameId.toUpperCase()} Game Running]</h3>`;
-    }
-}
-
-// Function to close the game modal
-function closeGame() {
-    const modal = document.getElementById('gameModal');
-    const container = document.getElementById('gameCanvasContainer');
-    
-    modal.style.display = "none";
-    container.innerHTML = ""; // This instantly kills the iframe & cuts resource usage
-}
-
-// Close modal if user clicks outside the box
-window.onclick = function(event) {
-    const modal = document.getElementById('gameModal');
-    if (event.target == modal) {
-        closeGame();
-    }
-}
-
-// Your full Neon Merge game code packed neatly as a string template for the iframe srcdoc
-function getNeonMergeSource() {
-    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -510,4 +466,3 @@ function getNeonMergeSource() {
     </script>
 </body>
 </html>`;
-}
