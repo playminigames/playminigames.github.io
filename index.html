@@ -2,467 +2,259 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Merge</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Central</title>
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap");
-        
-        body, html {
+        /* --- Reset & Core Styling --- */
+        * {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
             background-color: #0f172a;
-            overflow: hidden;
-            font-family: "Orbitron", sans-serif;
-            touch-action: none;
-            user-select: none;
+            color: #f8fafc;
+            padding-bottom: 60px;
         }
 
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        canvas {
-            background: linear-gradient(to bottom, #1e293b, #0f172a);
-            max-width: 100%;
-            max-height: 100%;
-            aspect-ratio: 600 / 800;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            transform: translateZ(0); 
-        }
-
-        .ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        /* --- Header / Navigation --- */
+        header {
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 30px 5%;
+            background-color: #1e293b;
+            border-bottom: 2px solid #334155;
+            gap: 20px;
         }
 
-        .score-board {
-            margin-top: 2vh;
-            text-align: center;
-            pointer-events: auto;
+        @media(min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+            }
         }
 
-        .score-title {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .score-value {
-            font-size: 2.5rem;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            line-height: 1;
-        }
-
-        .next-piece-container {
-            position: absolute;
-            top: 2vh;
-            right: 3vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(30, 41, 59, 0.8);
-            padding: 8px 12px;
-            border-radius: 12px;
-            border: 1px solid #334155;
-            pointer-events: auto;
-        }
-
-        .next-title {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin-bottom: 3px;
-            letter-spacing: 1px;
-        }
-
-        #next-piece-canvas {
-            width: 50px;
-            height: 50px;
-            background: transparent;
-            box-shadow: none;
-            aspect-ratio: auto;
-        }
-
-        #modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            pointer-events: auto;
-            z-index: 50;
-            transition: opacity 0.3s;
-        }
-
-        .hidden {
-            opacity: 0;
-            pointer-events: none !important;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-            padding: 12px 35px;
-            border-radius: 9999px;
-            font-size: 1.1rem;
+        .logo {
+            font-size: 1.8rem;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border: none;
+            color: #38bdf8;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
-            transition: transform 0.1s, box-shadow 0.1s;
         }
 
-        .btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 10px rgba(139, 92, 246, 0.3);
+        /* --- Search Bar --- */
+        .search-container {
+            width: 100%;
+            max-width: 400px;
         }
 
-        .neon-text {
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 30px;
+            color: #f8fafc;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        /* --- Categories Feature --- */
+        .categories-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px 5%;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background-color: #1e293b;
+            color: #94a3b8;
+            border: 2px solid #334155;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+        }
+
+        /* --- Game Grid Layout --- */
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 5%;
+        }
+
+        /* --- Square Game Cards --- */
+        .game-card {
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            aspect-ratio: 1 / 1; /* Makes the card perfectly square */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
             color: #fff;
-            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073;
+        }
+
+        .game-tag {
+            font-size: 0.8rem;
+            background-color: #334155;
+            color: #94a3b8;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- No Results Message --- */
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <canvas id="gameCanvas" width="600" height="800"></canvas>
-        <div class="ui-layer">
-            <div class="score-board">
-                <div class="score-title">Score</div>
-                <div class="score-value" id="scoreDisplay">0</div>
-            </div>
-            <div class="next-piece-container">
-                <div class="next-title">NEXT</div>
-                <canvas id="next-piece-canvas" width="80" height="80"></canvas>
-            </div>
+
+    <header>
+        <div class="logo" onclick="resetFilters()">🎮 Arcade Central</div>
+        <div class="search-container">
+            <input type="text" id="searchBar" class="search-input" placeholder="Search games..." oninput="filterGames()">
         </div>
-        <div id="modal-overlay">
-            <h1 class="text-4xl md:text-5xl font-black mb-2 neon-text" id="modal-title">NEON MERGE</h1>
-            <p class="text-slate-300 mb-6 text-sm md:text-base" id="modal-subtitle">Match colors, build the biggest orb.</p>
-            <div class="mb-6 text-center hidden" id="high-score-container">
-                <div class="text-slate-400 text-sm tracking-widest uppercase">High Score</div>
-                <div class="text-3xl text-white font-bold" id="high-score-display">0</div>
-            </div>
-            <button class="btn" id="start-btn">Play Now</button>
-        </div>
+    </header>
+
+    <div class="categories-container">
+        <button class="category-btn active" onclick="filterCategory('all', this)">All Games</button>
+        <button class="category-btn" onclick="filterCategory('puzzle', this)">Puzzle</button>
+        <button class="category-btn" onclick="filterCategory('action', this)">Action</button>
+        <button class="category-btn" onclick="filterCategory('retro', this)">Retro</button>
     </div>
 
+    <main class="game-container" id="gameGrid">
+        
+        <a href="https://playminigames.github.io/neonmerge/" target="_blank" class="game-card" data-title="neon merge" data-category="puzzle">
+            <div class="game-icon">🟢</div>
+            <div class="game-title">Neon Merge</div>
+            <div class="game-tag">Puzzle</div>
+        </a>
+
+        <a href="https://example.com/space" target="_blank" class="game-card" data-title="space invaders" data-category="action">
+            <div class="game-icon">🚀</div>
+            <div class="game-title">Space Invaders</div>
+            <div class="game-tag">Action</div>
+        </a>
+
+        <a href="https://example.com/snake" target="_blank" class="game-card" data-title="retro snake" data-category="retro">
+            <div class="game-icon">🐍</div>
+            <div class="game-title">Retro Snake</div>
+            <div class="game-tag">Retro</div>
+        </a>
+
+        <a href="https://example.com/pong" target="_blank" class="game-card" data-title="classic pong" data-category="retro">
+            <div class="game-icon">🏓</div>
+            <div class="game-title">Classic Pong</div>
+            <div class="game-tag">Retro</div>
+        </a>
+
+        <div class="no-results" id="noResults">No games match your filters.</div>
+
+    </main>
+
     <script>
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-        let bestScore = localStorage.getItem("neonMergeHighScore") || 0;
+        let currentCategory = 'all';
 
-        function initAudio() {
-            if (!audioCtx) audioCtx = new AudioContext();
-            if (audioCtx.state === "suspended") audioCtx.resume();
-        }
+        function filterGames() {
+            const searchQuery = document.getElementById('searchBar').value.toLowerCase();
+            const cards = document.querySelectorAll('.game-card');
+            let visibleCount = 0;
 
-        function playSound(type, tier = 0) {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const category = card.getAttribute('data-category');
 
-            if (type === "drop") {
-                osc.type = "sine";
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-            } else if (type === "merge") {
-                osc.type = "triangle";
-                const baseFreq = Math.max(80, 800 - (tier * 70)); 
-                osc.frequency.setValueAtTime(baseFreq, now);
-                osc.frequency.exponentialRampToValueAtTime(baseFreq / 2, now + 0.15);
-                gainNode.gain.setValueAtTime(0.5, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now); osc.stop(now + 0.15);
-            } else if (type === "gameover") {
-                osc.type = "sawtooth";
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 1);
-                gainNode.gain.setValueAtTime(0.4, now);
-                gainNode.gain.linearRampToValueAtTime(0.01, now + 1);
-                osc.start(now); osc.stop(now + 1);
-            }
-        }
+                const matchesSearch = title.includes(searchQuery);
+                const matchesCategory = (currentCategory === 'all' || category === currentCategory);
 
-        const LOGICAL_WIDTH = 600;
-        const LOGICAL_HEIGHT = 800;
-        const DEADLINE_Y = 150;
-
-        const TIERS = [
-            { r: 18,  color: "#ff0055", points: 2 },
-            { r: 28,  color: "#ff5500", points: 4 },
-            { r: 40,  color: "#ffaa00", points: 8 },
-            { r: 54,  color: "#aaff00", points: 16 },
-            { r: 70,  color: "#00ff55", points: 32 },
-            { r: 88,  color: "#00ffaa", points: 64 },
-            { r: 108, color: "#00aaff", points: 128 },
-            { r: 130, color: "#0055ff", points: 256 },
-            { r: 154, color: "#5500ff", points: 512 },
-            { r: 180, color: "#aa00ff", points: 1024 },
-            { r: 210, color: "#ff00aa", points: 2048 }
-        ];
-
-        const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events;
-
-        let engine, world, canvas, ctx, nextCanvas, nextCtx;
-        let gameState = "MENU", score = 0, currentTier = 0, nextTier = 0, ghostX = LOGICAL_WIDTH / 2, dropCooldown = false;
-        let particles = [], floatingTexts = [], shakeTime = 0, mergingIds = new Set(), pendingMerges = [];
-
-        const scoreDisplay = document.getElementById("scoreDisplay");
-        const modalOverlay = document.getElementById("modal-overlay");
-        const modalTitle = document.getElementById("modal-title");
-        const modalSubtitle = document.getElementById("modal-subtitle");
-        const startBtn = document.getElementById("start-btn");
-        const highScoreContainer = document.getElementById("high-score-container");
-        const highScoreDisplay = document.getElementById("high-score-display");
-
-        function init() {
-            canvas = document.getElementById("gameCanvas");
-            ctx = canvas.getContext("2d", { alpha: false });
-            nextCanvas = document.getElementById("next-piece-canvas");
-            nextCtx = nextCanvas.getContext("2d");
-
-            engine = Engine.create();
-            world = engine.world;
-            engine.gravity.y = 1.5;
-
-            const wallOptions = { isStatic: true, render: { visible: false }, friction: 0.1, restitution: 0.2 };
-            Composite.add(world, [
-                Bodies.rectangle(LOGICAL_WIDTH/2, LOGICAL_HEIGHT + 30, LOGICAL_WIDTH, 60, wallOptions),
-                Bodies.rectangle(-30, LOGICAL_HEIGHT/2, 60, LOGICAL_HEIGHT * 2, wallOptions),
-                Bodies.rectangle(LOGICAL_WIDTH + 30, LOGICAL_HEIGHT/2, 60, LOGICAL_HEIGHT * 2, wallOptions)
-            ]);
-
-            Events.on(engine, "collisionStart", handleCollisions);
-            setupInput();
-            requestAnimationFrame(gameLoop);
-            startBtn.addEventListener("click", startGame);
-        }
-
-        function startGame() {
-            initAudio();
-            Composite.allBodies(world).forEach(body => { if (!body.isStatic) Composite.remove(world, body); });
-            score = 0; updateScoreDisplay();
-            particles = []; floatingTexts = []; mergingIds.clear(); pendingMerges = [];
-            currentTier = getRandomStartingTier(); nextTier = getRandomStartingTier(); drawNextPiece();
-            gameState = "PLAYING"; dropCooldown = false;
-            modalOverlay.classList.add("hidden");
-        }
-
-        function gameOver() {
-            gameState = "GAMEOVER"; playSound("gameover");
-            if (score > bestScore) {
-                bestScore = score;
-                try { localStorage.setItem("neonMergeHighScore", bestScore); } catch(e){}
-            }
-            setTimeout(() => {
-                modalTitle.innerText = "GAME OVER";
-                modalTitle.style.color = "#ff0055";
-                modalTitle.style.textShadow = "0 0 20px #ff0055";
-                modalSubtitle.innerText = "Final Score: " + score;
-                highScoreContainer.classList.remove("hidden");
-                highScoreDisplay.innerText = bestScore;
-                startBtn.innerText = "Play Again";
-                modalOverlay.classList.remove("hidden");
-            }, 1000);
-        }
-
-        function getRandomStartingTier() {
-            const rand = Math.random();
-            if (rand < 0.5) return 0; if (rand < 0.8) return 1; if (rand < 0.95) return 2; return 3;
-        }
-
-        function dropPiece() {
-            if (gameState !== "PLAYING" || dropCooldown) return;
-            playSound("drop"); dropCooldown = true;
-            const radius = TIERS[currentTier].r;
-            const body = Bodies.circle(ghostX, 80, radius, {
-                restitution: 0.2, friction: 0.1, density: 0.001 * (currentTier + 1), label: "orb"
-            });
-            body.tier = currentTier;
-            Composite.add(world, body);
-
-            setTimeout(() => {
-                if (gameState === "PLAYING") {
-                    currentTier = nextTier; nextTier = getRandomStartingTier(); drawNextPiece();
-                    updateGhostPosition(ghostX); dropCooldown = false;
-                }
-            }, 800);
-        }
-
-        function handleCollisions(event) {
-            const pairs = event.pairs;
-            for (let i = 0; i < pairs.length; i++) {
-                const bodyA = pairs[i].bodyA, bodyB = pairs[i].bodyB;
-                if (bodyA.label === "orb" && bodyB.label === "orb" && bodyA.tier === bodyB.tier) {
-                    if (!mergingIds.has(bodyA.id) && !mergingIds.has(bodyB.id)) {
-                        mergingIds.add(bodyA.id); mergingIds.add(bodyB.id);
-                        pendingMerges.push({ a: bodyA, b: bodyB, tier: bodyA.tier });
-                    }
-                }
-            }
-        }
-
-        function processMerges() {
-            if (pendingMerges.length === 0) return;
-            pendingMerges.forEach(merge => {
-                const { a, b, tier } = merge;
-                const midX = (a.position.x + b.position.x) / 2, midY = (a.position.y + b.position.y) / 2;
-                Composite.remove(world, [a, b]);
-                const nextT = tier + 1;
-                const points = TIERS[nextT] ? TIERS[nextT].points : TIERS[tier].points * 2;
-                score += points; updateScoreDisplay();
-                createParticles(midX, midY, TIERS[tier].color); createFloatingText(midX, midY, "+" + points);
-                playSound("merge", nextT); shakeTime = 10;
-                
-                if (nextT < TIERS.length) {
-                    const newBody = Bodies.circle(midX, midY, TIERS[nextT].r, {
-                        restitution: 0.1, friction: 0.1, density: 0.001 * (nextT + 1), label: "orb"
-                    });
-                    newBody.tier = nextT; Composite.add(world, newBody);
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'flex';
+                    visibleCount++;
                 } else {
-                    createParticles(midX, midY, "#ffffff", 50); shakeTime = 30;
+                    card.style.display = 'none';
                 }
             });
-            mergingIds.clear(); pendingMerges = [];
-        }
 
-        function checkGameOver() {
-            if (gameState !== "PLAYING") return;
-            const bodies = Composite.allBodies(world);
-            for (let i = 0; i < bodies.length; i++) {
-                const body = bodies[i];
-                if (body.label === "orb" && body.position.y - body.circleRadius < DEADLINE_Y && body.speed < 0.5) {
-                    gameOver(); return;
-                }
+            // Display "No Results" message if everything is filtered out
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
             }
         }
 
-        function setupInput() {
-            const container = document.getElementById("game-container");
-            const handleMove = (xRaw) => {
-                if (gameState !== "PLAYING" || dropCooldown) return;
-                const rect = canvas.getBoundingClientRect();
-                updateGhostPosition((xRaw - rect.left) * (canvas.width / rect.width));
-            };
-            container.addEventListener("mousemove", (e) => handleMove(e.clientX));
-            container.addEventListener("mousedown", (e) => { if (e.target !== startBtn && gameState === "PLAYING") dropPiece(); });
-            container.addEventListener("touchmove", (e) => { if (e.cancelable) e.preventDefault(); handleMove(e.touches[0].clientX); }, { passive: false });
-            container.addEventListener("touchend", (e) => { if (e.target !== startBtn && gameState === "PLAYING") dropPiece(); });
+        function filterCategory(category, buttonElement) {
+            currentCategory = category;
+
+            // Toggle active visual class on category tabs
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+
+            filterGames();
         }
 
-        function updateGhostPosition(logicalX) {
-            const radius = TIERS[currentTier].r;
-            ghostX = Math.max(radius, Math.min(LOGICAL_WIDTH - radius, logicalX));
+        function resetFilters() {
+            document.getElementById('searchBar').value = '';
+            const allBtn = document.querySelector('.category-btn');
+            filterCategory('all', allBtn);
         }
-
-        function updateScoreDisplay() {
-            scoreDisplay.innerText = score;
-        }
-
-        function drawNextPiece() {
-            nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
-            const r = Math.min(25, TIERS[nextTier].r * 0.8);
-            nextCtx.beginPath(); nextCtx.arc(40, 40, r, 0, Math.PI * 2);
-            nextCtx.fillStyle = TIERS[nextTier].color; nextCtx.fill();
-            nextCtx.shadowBlur = 15; nextCtx.shadowColor = TIERS[nextTier].color; nextCtx.fill();
-            nextCtx.shadowBlur = 0;
-        }
-
-        function createParticles(x, y, color, count = 20) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2, speed = Math.random() * 5 + 2;
-                particles.push({ x: x, y: y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1.0, color: color, size: Math.random() * 4 + 2 });
-            }
-        }
-
-        function updateAndDrawParticles() {
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.03;
-                if (p.life <= 0) { particles.splice(i, 1); continue; }
-                ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-            }
-            ctx.globalAlpha = 1.0;
-        }
-
-        function createFloatingText(x, y, text) { floatingTexts.push({ x: x, y: y, text: text, life: 1.0 }); }
-
-        function updateAndDrawTexts() {
-            ctx.font = "bold 24px 'Orbitron', sans-serif"; ctx.textAlign = "center";
-            for (let i = floatingTexts.length - 1; i >= 0; i--) {
-                const ft = floatingTexts[i]; ft.y -= 1.5; ft.life -= 0.02;
-                if (ft.life <= 0) { floatingTexts.splice(i, 1); continue; }
-                ctx.globalAlpha = ft.life; ctx.fillStyle = "#ffffff"; ctx.fillText(ft.text, ft.x, ft.y);
-            }
-            ctx.globalAlpha = 1.0;
-        }
-
-        let lastTime = 0, frameCount = 0;
-        function gameLoop(timestamp) {
-            requestAnimationFrame(gameLoop);
-            let dt = timestamp - lastTime; if (dt > 50) dt = 16.66; lastTime = timestamp;
-            Engine.update(engine, dt); processMerges();
-            frameCount++; if (frameCount % 60 === 0) checkGameOver();
-            ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
-            ctx.save();
-            if (shakeTime > 0) { ctx.translate((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4); shakeTime--; }
-
-            ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(0, DEADLINE_Y); ctx.lineTo(LOGICAL_WIDTH, DEADLINE_Y);
-            ctx.strokeStyle = "rgba(255, 0, 85, 0.3)"; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
-
-            if (gameState === "PLAYING" && !dropCooldown) {
-                const radius = TIERS[currentTier].r;
-                ctx.beginPath(); ctx.arc(ghostX, 80, radius, 0, Math.PI * 2); ctx.fillStyle = TIERS[currentTier].color; ctx.globalAlpha = 0.4; ctx.fill();
-                ctx.beginPath(); ctx.moveTo(ghostX, 80 + radius); ctx.lineTo(ghostX, LOGICAL_HEIGHT); ctx.strokeStyle = TIERS[currentTier].color; ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1.0;
-            }
-
-            const bodies = Composite.allBodies(world);
-            for (let i = 0; i < bodies.length; i++) {
-                const body = bodies[i];
-                if (body.label === "orb") {
-                    const t = body.tier;
-                    ctx.translate(body.position.x, body.position.y); ctx.rotate(body.angle);
-                    ctx.beginPath(); ctx.arc(0, 0, TIERS[t].r, 0, Math.PI * 2); ctx.fillStyle = TIERS[t].color; ctx.fill();
-                    ctx.lineWidth = 4; ctx.strokeStyle = "#ffffff"; ctx.globalAlpha = 0.3; ctx.stroke(); ctx.globalAlpha = 1.0;
-                    ctx.beginPath(); ctx.arc(-TIERS[t].r*0.3, -TIERS[t].r*0.3, TIERS[t].r*0.2, 0, Math.PI * 2); ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.fill();
-                    ctx.rotate(-body.angle); ctx.translate(-body.position.x, -body.position.y);
-                }
-            }
-            updateAndDrawParticles(); updateAndDrawTexts(); ctx.restore();
-        }
-        window.onload = init;
     </script>
 </body>
-</html>`;
+</html>
