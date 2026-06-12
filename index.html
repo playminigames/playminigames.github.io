@@ -2,275 +2,448 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayMiniGames | Play Mini Games Online For Free | No Ads, No Hidden Costs!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Pac-Man Mobile</title>
     <style>
-        /* --- Reset & Core Styling --- */
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* CRITICAL FIX: Forcefully kills all native browser touch reactions (zoom, scroll, pan) globally */
+            touch-action: none !important;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
-
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            padding-bottom: 60px;
-        }
-
-        /* --- Header / Navigation --- */
-        header {
+            background-color: #111;
+            color: white;
+            font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 5%;
-            background-color: #1e293b;
-            border-bottom: 2px solid #334155;
-            gap: 20px;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: fixed; /* Prevents the elastic "rubber-band" scrolling on iOS */
+            width: 100%;
+            height: 100%;
         }
-
-        @media(min-width: 768px) {
-            header {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-        }
-
-        .logo {
-            font-size: 1.8rem;
+        #ui-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 440px;
+            padding: 10px 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #38bdf8;
-            cursor: pointer;
-        }
-
-        /* --- Search Bar --- */
-        .search-container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 20px;
-            background-color: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 30px;
-            color: #f8fafc;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .search-input:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
-        }
-
-        /* --- Categories Feature --- */
-        .categories-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 20px 5%;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            background-color: #1e293b;
-            color: #94a3b8;
-            border: 2px solid #334155;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .category-btn:hover, .category-btn.active {
-            background-color: #38bdf8;
-            color: #0f172a;
-            border-color: #38bdf8;
-        }
-
-        /* --- Game Grid Layout --- */
-        .game-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 5%;
-        }
-
-        /* --- Square Game Cards --- */
-        .game-card {
-            background-color: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 16px;
-            aspect-ratio: 1 / 1; /* Makes the card perfectly square */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-
-        .game-card:hover {
-            transform: translateY(-5px);
-            border-color: #38bdf8;
-            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.15);
-        }
-
-        .game-icon {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-        }
-
-        .game-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-
-        .game-tag {
-            font-size: 0.8rem;
-            background-color: #334155;
-            color: #94a3b8;
-            padding: 4px 10px;
-            border-radius: 12px;
             text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px;
         }
-
-        /* --- No Results Message --- */
-        .no-results {
+        #score-val { color: #ffff00; }
+        #lives-container { color: #ff3333; }
+        canvas {
+            background-color: #000;
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.3);
+            border: 4px solid #0000ff;
+            border-radius: 8px;
+            max-width: 100vw;
+            max-height: 70vh;
+        }
+        #msg-overlay {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffff00;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #0000ff;
             text-align: center;
-            grid-column: 1 / -1;
-            padding: 40px;
-            color: #94a3b8;
-            font-size: 1.2rem;
             display: none;
+            pointer-events: none;
+        }
+        .instructions {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            max-width: 300px;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo" onclick="resetFilters()">PlayMiniGames</div>
-        <div class="search-container">
-            <input type="text" id="searchBar" class="search-input" placeholder="Search games..." oninput="filterGames()">
-        </div>
-    </header>
-
-    <div class="categories-container">
-        <button class="category-btn active" onclick="filterCategory('all', this)">All Games</button>
-        <button class="category-btn" onclick="filterCategory('puzzle', this)">Puzzle</button>
-        <button class="category-btn" onclick="filterCategory('action', this)">Action</button>
-        <button class="category-btn" onclick="filterCategory('retro', this)">Retro</button>
+    <div id="ui-container">
+        <div>Score: <span id="score-val">0</span></div>
+        <div id="lives-container">❤❤❤</div>
     </div>
 
-    <main class="game-container" id="gameGrid">
-        
-        <a href="https://playminigames.github.io/neonmerge/" target="_blank" class="game-card" data-title="neon merge" data-category="puzzle">
-            <div class="game-icon">🍎</div>
-            <div class="game-title">Neon Merge</div>
-            <div class="game-tag">Puzzle</div>
-        </a>
-
-        <a href="https://playminigames.github.io/spaceinvaders/" target="_blank" class="game-card" data-title="space invaders" data-category="action">
-            <div class="game-icon">🚀</div>
-            <div class="game-title">Space Invaders</div>
-            <div class="game-tag">Action</div>
-        </a>
-
-        <a href="https://playminigames.github.io/snake/" target="_blank" class="game-card" data-title="snake" data-category="retro">
-            <div class="game-icon">🐍</div>
-            <div class="game-title">Snake</div>
-            <div class="game-tag">Retro</div>
-        </a>
-
-        <a href="https://playminigames.github.io/classicpong" target="_blank" class="game-card" data-title="classic pong" data-category="retro">
-            <div class="game-icon">🏓</div>
-            <div class="game-title">Classic Pong</div>
-            <div class="game-tag">Retro</div>
-        </a>
-
-        <a href="https://playminigames.github.io/brickblaster" target="_blank" class="game-card" data-title="brick blaster" data-category="puzzle">
-            <div class="game-icon"> 🧱</div>
-            <div class="game-title">Brick Blaster</div>
-            <div class="game-tag">Puzzle</div>
-        </a>
-         <a href="https://playminigames.github.io/racingattack" target="_blank" class="game-card" data-title="racing attack" data-category="action">
-            <div class="game-icon">🏎️</div>
-            <div class="game-title">Racing Attack</div>
-            <div class="game-tag">Action</div>
-        </a>
-            <a href="https://playminigames.github.io/pacman" target="_blank" class="game-card" data-title="pac-man" data-category="action">
-            <div class="game-icon">👻</div>
-            <div class="game-title">Pac-Man</div>
-            <div class="game-tag">Action</div>
-        </a>
-
-        <div class="no-results" id="noResults">No games match your filters.</div>
-
-    </main>
+    <canvas id="gameCanvas"></canvas>
+    <div id="msg-overlay">Tap / Swipe to Start</div>
+    <div class="instructions">Desktop: Arrow Keys / WASD<br>Mobile: Swipe anywhere to steer</div>
 
     <script>
-        let currentCategory = 'all';
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreVal = document.getElementById('score-val');
+        const livesContainer = document.getElementById('lives-container');
+        const msgOverlay = document.getElementById('msg-overlay');
 
-        function filterGames() {
-            const searchQuery = document.getElementById('searchBar').value.toLowerCase();
-            const cards = document.querySelectorAll('.game-card');
-            let visibleCount = 0;
+        const TILE_SIZE = 20;
+        const map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,3,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,3,1],
+            [1,2,1,1,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,2,1],
+            [1,2,1,1,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,2,1],
+            [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+            [1,2,1,1,1,2,1,2,1,1,1,1,1,2,1,2,1,1,1,2,1],
+            [1,2,2,2,2,2,1,2,2,2,1,2,2,2,1,2,2,2,2,2,1],
+            [1,1,1,1,1,2,1,1,1,0,1,0,1,1,1,2,1,1,1,1,1],
+            [0,0,0,0,1,2,1,0,0,0,0,0,0,0,1,2,1,0,0,0,0],
+            [1,1,1,1,1,2,1,0,1,1,0,1,1,0,1,2,1,1,1,1,1],
+            [0,0,0,0,0,2,0,0,1,0,0,0,1,0,0,2,0,0,0,0,0],
+            [1,1,1,1,1,2,1,0,1,1,1,1,1,0,1,2,1,1,1,1,1],
+            [0,0,0,0,1,2,1,0,0,0,0,0,0,0,1,2,1,0,0,0,0],
+            [1,1,1,1,1,2,1,0,1,1,1,1,1,0,1,2,1,1,1,1,1],
+            [1,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1],
+            [1,2,1,1,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,2,1],
+            [1,3,2,2,1,2,2,2,2,2,0,2,2,2,2,2,1,2,2,3,1],
+            [1,1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1,1],
+            [1,2,2,2,2,2,1,2,2,2,1,2,2,2,1,2,2,2,2,2,1],
+            [1,2,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,2,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
 
-            cards.forEach(card => {
-                const title = card.getAttribute('data-title');
-                const category = card.getAttribute('data-category');
+        const MAP_ROWS = map.length;
+        const MAP_COLS = map[0].length;
+        canvas.width = MAP_COLS * TILE_SIZE;
+        canvas.height = MAP_ROWS * TILE_SIZE;
 
-                const matchesSearch = title.includes(searchQuery);
-                const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+        let score = 0;
+        let lives = 3;
+        let gameOver = false;
+        let gameStarted = false;
+        let currentMap = JSON.parse(JSON.stringify(map));
+        let totalPellets = countPellets();
+        let powerPillTimer = 0;
 
-                if (matchesSearch && matchesCategory) {
-                    card.style.display = 'flex';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
+        let pacman = {
+            x: 10 * TILE_SIZE + TILE_SIZE / 2,
+            y: 16 * TILE_SIZE + TILE_SIZE / 2,
+            dirX: 0,
+            dirY: 0,
+            nextDirX: 0,
+            nextDirY: 0,
+            speed: 2,
+            radius: 8,
+            angle: 0.2
+        };
+
+        let ghosts = [
+            { x: 9 * TILE_SIZE + TILE_SIZE/2, y: 10 * TILE_SIZE + TILE_SIZE/2, color: '#ff0000', dirX: 1, dirY: 0, speed: 1.5, mode: 'chase' },
+            { x: 11 * TILE_SIZE + TILE_SIZE/2, y: 10 * TILE_SIZE + TILE_SIZE/2, color: '#ffb8ff', dirX: -1, dirY: 0, speed: 1.5, mode: 'chase' },
+            { x: 10 * TILE_SIZE + TILE_SIZE/2, y: 9 * TILE_SIZE + TILE_SIZE/2, color: '#00ffff', dirX: 0, dirY: -1, speed: 1.5, mode: 'chase' },
+            { x: 10 * TILE_SIZE + TILE_SIZE/2, y: 11 * TILE_SIZE + TILE_SIZE/2, color: '#ffb852', dirX: 0, dirY: 1, speed: 1.5, mode: 'chase' }
+        ];
+
+        function countPellets() {
+            let count = 0;
+            for (let r = 0; r < MAP_ROWS; r++) {
+                for (let c = 0; c < MAP_COLS; c++) {
+                    if (map[r][c] === 2 || map[r][c] === 3) count++;
                 }
-            });
+            }
+            return count;
+        }
 
-            // Display "No Results" message if everything is filtered out
-            const noResults = document.getElementById('noResults');
-            if (visibleCount === 0) {
-                noResults.style.display = 'block';
-            } else {
-                noResults.style.display = 'none';
+        function setDirection(dx, dy) {
+            pacman.nextDirX = dx;
+            pacman.nextDirY = dy;
+            if (!gameStarted && !gameOver) {
+                gameStarted = true;
+                msgOverlay.style.display = 'none';
             }
         }
 
-        function filterCategory(category, buttonElement) {
-            currentCategory = category;
+        // Desktop Keyboard Controls
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') setDirection(0, -1);
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') setDirection(0, 1);
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') setDirection(-1, 0);
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') setDirection(1, 0);
+        });
 
-            // Toggle active visual class on category tabs
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            buttonElement.classList.add('active');
+        // --- HARDENED MOBILE CONTROL SYSTEM ---
+        let touchStartX = 0;
+        let touchStartY = 0;
 
-            filterGames();
+        // Force browser focus to the game canvas window immediately on tap
+        window.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].clientX;
+            touchStartY = e.changedTouches[0].clientY;
+            
+            if (gameOver) {
+                resetGame();
+            } else if (!gameStarted) {
+                setDirection(1, 0); // Start moving right on first touch
+            }
+        }, { passive: false });
+
+        // Forcefully block the mobile phone from trying to drag or bounce the webpage
+        window.addEventListener('touchmove', (e) => {
+            if (e.cancelable) e.preventDefault(); 
+        }, { passive: false });
+
+        window.addEventListener('touchend', (e) => {
+            let touchEndX = e.changedTouches[0].clientX;
+            let touchEndY = e.changedTouches[0].clientY;
+
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
+            
+            const threshold = 15; // Lowered threshold slightly for lightning-fast responsiveness
+
+            if (Math.abs(diffX) > threshold || Math.abs(diffY) > threshold) {
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    setDirection(diffX > 0 ? 1 : -1, 0); // Horizontal swipe
+                } else {
+                    setDirection(0, diffY > 0 ? 1 : -1); // Vertical swipe
+                }
+            }
+        }, { passive: false });
+
+        // Desktop Click Fallback
+        window.addEventListener('mousedown', () => { 
+            if (gameOver) resetGame();
+            else if (!gameStarted) setDirection(1, 0);
+        });
+
+        function isWall(x, y) {
+            let col = Math.floor(x / TILE_SIZE);
+            let row = Math.floor(y / TILE_SIZE);
+            if (col < 0 || col >= MAP_COLS) return false; 
+            if (row < 0 || row >= MAP_ROWS) return true;
+            return currentMap[row][col] === 1;
         }
 
-        function resetFilters() {
-            document.getElementById('searchBar').value = '';
-            const allBtn = document.querySelector('.category-btn');
-            filterCategory('all', allBtn);
+        function updatePacman() {
+            if (!gameStarted) return;
+
+            if ((pacman.x - TILE_SIZE/2) % TILE_SIZE === 0 && (pacman.y - TILE_SIZE/2) % TILE_SIZE === 0) {
+                if (pacman.nextDirX !== 0 || pacman.nextDirY !== 0) {
+                    if (!isWall(pacman.x + pacman.nextDirX * TILE_SIZE/2, pacman.y + pacman.nextDirY * TILE_SIZE/2)) {
+                        pacman.dirX = pacman.nextDirX;
+                        pacman.dirY = pacman.nextDirY;
+                    }
+                }
+            }
+
+            let futureX = pacman.x + pacman.dirX * pacman.speed;
+            let futureY = pacman.y + pacman.dirY * pacman.speed;
+
+            if (!isWall(futureX + pacman.dirX * (TILE_SIZE/2), futureY + pacman.dirY * (TILE_SIZE/2))) {
+                pacman.x = futureX;
+                pacman.y = futureY;
+            }
+
+            if (pacman.x < 0) pacman.x = canvas.width;
+            if (pacman.x > canvas.width) pacman.x = 0;
+
+            let currentGridX = Math.floor(pacman.x / TILE_SIZE);
+            let currentGridY = Math.floor(pacman.y / TILE_SIZE);
+
+            if (currentGridX >= 0 && currentGridX < MAP_COLS && currentGridY >= 0 && currentGridY < MAP_ROWS) {
+                let cellValue = currentMap[currentGridY][currentGridX];
+                if (cellValue === 2) {
+                    currentMap[currentGridY][currentGridX] = 0;
+                    score += 10;
+                    totalPellets--;
+                } else if (cellValue === 3) {
+                    currentMap[currentGridY][currentGridX] = 0;
+                    score += 50;
+                    totalPellets--;
+                    triggerPowerPill();
+                }
+                scoreVal.innerText = score;
+            }
+
+            pacman.angle += 0.05;
+            if (pacman.angle > 0.4) pacman.angle = 0.05;
+
+            if (totalPellets <= 0) endGame(true);
         }
+
+        function triggerPowerPill() {
+            powerPillTimer = 400;
+            ghosts.forEach(g => g.mode = 'frightened');
+        }
+
+        function updateGhosts() {
+            if (!gameStarted) return;
+
+            if (powerPillTimer > 0) {
+                powerPillTimer--;
+                if (powerPillTimer === 0) ghosts.forEach(g => g.mode = 'chase');
+            }
+
+            ghosts.forEach(ghost => {
+                if ((ghost.x - TILE_SIZE/2) % TILE_SIZE === 0 && (ghost.y - TILE_SIZE/2) % TILE_SIZE === 0) {
+                    let possibleDirs = [];
+                    const directions = [{x:1, y:0}, {x:-1, y:0}, {x:0, y:1}, {x:0, y:-1}];
+
+                    directions.forEach(d => {
+                        if (d.x === -ghost.dirX && d.y === -ghost.dirY) return;
+                        if (!isWall(ghost.x + d.x * TILE_SIZE, ghost.y + d.y * TILE_SIZE)) {
+                            possibleDirs.push(d);
+                        }
+                    });
+
+                    if (possibleDirs.length > 0) {
+                        let chosenDir;
+                        if (ghost.mode === 'frightened') {
+                            chosenDir = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
+                        } else {
+                            let bestDir = possibleDirs[0];
+                            let minDist = Infinity;
+                            possibleDirs.forEach(d => {
+                                let targetX = ghost.x + d.x * TILE_SIZE;
+                                let targetY = ghost.y + d.y * TILE_SIZE;
+                                let dist = Math.hypot(pacman.x - targetX, pacman.y - targetY);
+                                if (dist < minDist) {
+                                    minDist = dist;
+                                    bestDir = d;
+                                }
+                            });
+                            chosenDir = bestDir;
+                        }
+                        ghost.dirX = chosenDir.x;
+                        ghost.dirY = chosenDir.y;
+                    }
+                }
+
+                ghost.x += ghost.dirX * ghost.speed;
+                ghost.y += ghost.dirY * ghost.speed;
+
+                if (ghost.x < 0) ghost.x = canvas.width;
+                if (ghost.x > canvas.width) ghost.x = 0;
+
+                let distToPacman = Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y);
+                if (distToPacman < TILE_SIZE * 0.8) {
+                    if (ghost.mode === 'frightened') {
+                        ghost.x = 10 * TILE_SIZE + TILE_SIZE/2;
+                        ghost.y = 10 * TILE_SIZE + TILE_SIZE/2;
+                        ghost.mode = 'chase';
+                        score += 200;
+                        scoreVal.innerText = score;
+                    } else {
+                        handlePlayerDeath();
+                    }
+                }
+            });
+        }
+
+        function handlePlayerDeath() {
+            lives--;
+            if (lives < 0) {
+                endGame(false);
+            } else {
+                livesContainer.innerText = "❤".repeat(lives);
+                pacman.x = 10 * TILE_SIZE + TILE_SIZE / 2;
+                pacman.y = 16 * TILE_SIZE + TILE_SIZE / 2;
+                pacman.dirX = 0; pacman.dirY = 0;
+                pacman.nextDirX = 0; pacman.nextDirY = 0;
+            }
+        }
+
+        function drawMap() {
+            for (let r = 0; r < MAP_ROWS; r++) {
+                for (let c = 0; c < MAP_COLS; c++) {
+                    let tile = currentMap[r][c];
+                    if (tile === 1) {
+                        ctx.fillStyle = '#0000bf';
+                        ctx.fillRect(c * TILE_SIZE + 1, r * TILE_SIZE + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+                    } else if (tile === 2) {
+                        ctx.fillStyle = '#ffb8ae';
+                        ctx.beginPath();
+                        ctx.arc(c * TILE_SIZE + TILE_SIZE/2, r * TILE_SIZE + TILE_SIZE/2, 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (tile === 3) {
+                        ctx.fillStyle = '#ffb8ff';
+                        ctx.beginPath();
+                        ctx.arc(c * TILE_SIZE + TILE_SIZE/2, r * TILE_SIZE + TILE_SIZE/2, 6, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+        }
+
+        function drawPacman() {
+            ctx.fillStyle = '#ffff00';
+            ctx.beginPath();
+            let rotation = 0;
+            if (pacman.dirX === 1) rotation = 0;
+            else if (pacman.dirX === -1) rotation = Math.PI;
+            else if (pacman.dirY === 1) rotation = Math.PI / 2;
+            else if (pacman.dirY === -1) rotation = 3 * Math.PI / 2;
+
+            ctx.arc(pacman.x, pacman.y, pacman.radius, rotation + pacman.angle, rotation + (Math.PI * 2) - pacman.angle);
+            ctx.lineTo(pacman.x, pacman.y);
+            ctx.fill();
+        }
+
+        function drawGhosts() {
+            ghosts.forEach(ghost => {
+                ctx.fillStyle = ghost.mode === 'frightened' ? '#0000ff' : ghost.color;
+                if (ghost.mode === 'frightened' && powerPillTimer < 100 && Math.floor(powerPillTimer / 10) % 2 === 0) {
+                    ctx.fillStyle = '#ffffff';
+                }
+                ctx.beginPath();
+                ctx.arc(ghost.x, ghost.y - 2, 8, Math.PI, 0, false);
+                ctx.lineTo(ghost.x + 8, ghost.y + 8);
+                ctx.lineTo(ghost.x - 8, ghost.y + 8);
+                ctx.fill();
+            });
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawMap();
+            updatePacman();
+            updateGhosts();
+            drawPacman();
+            drawGhosts();
+            if (!gameOver) requestAnimationFrame(gameLoop);
+        }
+
+        function endGame(isWin) {
+            gameOver = true;
+            msgOverlay.style.display = 'block';
+            msgOverlay.innerHTML = isWin ? "YOU WIN!<br><span style='font-size:14px'>Tap screen to restart</span>" : "GAME OVER<br><span style='font-size:14px'>Tap screen to retry</span>";
+        }
+
+        function resetGame() {
+            score = 0;
+            lives = 3;
+            gameOver = false;
+            gameStarted = false;
+            currentMap = JSON.parse(JSON.stringify(map));
+            totalPellets = countPellets();
+            powerPillTimer = 0;
+            scoreVal.innerText = score;
+            livesContainer.innerText = "❤❤•";
+            pacman.x = 10 * TILE_SIZE + TILE_SIZE / 2;
+            pacman.y = 16 * TILE_SIZE + TILE_SIZE / 2;
+            pacman.dirX = 0; pacman.dirY = 0;
+            pacman.nextDirX = 0; pacman.nextDirY = 0;
+            msgOverlay.style.display = 'block';
+            msgOverlay.innerHTML = "Swipe / Tap<br>To Start";
+            requestAnimationFrame(gameLoop);
+        }
+
+        msgOverlay.style.display = 'block';
+        requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>
